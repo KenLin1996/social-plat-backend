@@ -1,0 +1,6 @@
+# Python 虛擬環境
+../venv/
+
+# Python 忽略檔案
+*.pyc
+__pycache__/
