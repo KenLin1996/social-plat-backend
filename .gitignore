@@ -4,3 +4,4 @@
 # Python 忽略檔案
 *.pyc
 __pycache__/
+.env
