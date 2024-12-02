@@ -1,9 +1,10 @@
 # backend/models/post.py
 from datetime import datetime, timezone
 from backend import db
-from backend.models.user import User
+# from backend.models.user import User
 from backend.models.like import Like
 from backend.models.favorite import Favorite
+from backend.models.comment import Comment
 
 
 class Post(db.Model):
@@ -18,11 +19,14 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # 關聯：每篇文章的作者
-    author = db.relationship('User', backref='posts', lazy=True)
+    author = db.relationship('User', backref='posts', lazy='joined')
 
     # 關聯：每篇貼文可以被多個使用者按讚和收藏
     likes = db.relationship('Like', backref='post', lazy=True)
     favorites = db.relationship('Favorite', backref='post', lazy=True)
+
+    # 關聯：每篇文章可以有多個留言
+    comments = db.relationship('Comment', backref='post', lazy=True)
 
     # 時間戳欄位
     created_at = db.Column(

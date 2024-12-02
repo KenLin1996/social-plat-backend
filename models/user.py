@@ -5,6 +5,7 @@ from backend import db
 from backend.models.post import Post
 from backend.models.like import Like
 from backend.models.favorite import Favorite
+from backend.models.comment import Comment
 
 
 class User(db.Model):
@@ -33,6 +34,9 @@ class User(db.Model):
     # 關聯：使用者可以有多個按讚記錄和收藏記錄
     likes = db.relationship('Like', backref='user', lazy=True)
     favorites = db.relationship('Favorite', backref='user', lazy=True)
+
+    # 外鍵關聯：一個 User 可以有多條 Comment
+    comments = db.relationship('Comment', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
