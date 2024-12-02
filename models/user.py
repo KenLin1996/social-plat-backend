@@ -2,6 +2,9 @@
 from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend import db
+from backend.models.post import Post
+from backend.models.like import Like
+from backend.models.favorite import Favorite
 
 
 class User(db.Model):
@@ -23,6 +26,13 @@ class User(db.Model):
         db.DateTime, default=datetime.now(timezone.utc))  # 帳戶創建時間
     updated_at = db.Column(db.DateTime, default=datetime.now(
         timezone.utc), onupdate=datetime.now(timezone.utc))  # 帳戶更新時間
+
+    # 一對多關聯（User -> Post）
+    posts = db.relationship('Post', backref='author', lazy=True)
+
+    # 關聯：使用者可以有多個按讚記錄和收藏記錄
+    likes = db.relationship('Like', backref='user', lazy=True)
+    favorites = db.relationship('Favorite', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -52,3 +62,24 @@ class User(db.Model):
     @classmethod
     def get_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
+
+    # 更新用戶資料的方法
+    @classmethod
+    def update_user(cls, user_id, **kwargs):
+        """
+        更新用戶資料。
+        :param user_id: 用戶ID
+        :param kwargs: 要更新的欄位和值，例如：username='新名稱'
+        :return: 更新後的用戶物件，或 None（若用戶不存在）
+        """
+        user = cls.query.get(user_id)
+        if not user:
+            return None
+
+        # 根據傳入的欄位和值進行更新
+        for key, value in kwargs.items():
+            if hasattr(user, key):  # 確認 User 模型中存在該屬性
+                setattr(user, key, value)
+
+        db.session.commit()
+        return user
